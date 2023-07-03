@@ -1,0 +1,22 @@
+demand 
+-id
+-name
+-category-1
+-sub-cate-1
+-description
+-image[]
+-nameVendor
+-idVendor
+-rating=0
+-->post,getlist,getbyId,delete
+--> post rating
+
+myCart
+-idDemand
+-idVendor
+
+
+order
+idVendor
+idDemand
+status=pending,shipping,complete,cancelled
