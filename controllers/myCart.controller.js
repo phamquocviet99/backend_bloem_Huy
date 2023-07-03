@@ -49,23 +49,33 @@ export const post = async (req, res) => {
 export const getByIdVendor = async (req, res) => {
   try {
     if (req.params.id) {
-      await myCardModel
-        .find({ idVendor: req.params.id })
-        .then((result) => {
-          return res.status(200).send({
-            success: true,
-            code: 0,
-            message: "Thành công",
-            data: result,
+      var listCart = [];
+      const listCardOfVendor = await myCardModel.find({
+        idVendor: req.params.id,
+      });
+      for (var i in listCardOfVendor) {
+        await demandModel
+          .findById({ _id: listCardOfVendor[i].idDemand })
+          .then((results) => {
+            var n = results;
+            n.quantity = listCardOfVendor[i].quantity;
+            listCart.push(n);
+          })
+          .catch((error) => {
+            return res.status(500).send({
+              success: true,
+              code: 0,
+              message: "Có lỗi trong quá trình lấy dữ liệu",
+              error: error.message,
+            });
           });
-        })
-        .catch((error) => {
-          return res.status(500).send({
-            error: error.message,
-            message: "Không tìm thấy đối tượng IdVendor",
-            success: false,
-          });
-        });
+      }
+      return res.status(200).send({
+        success: true,
+        code: 0,
+        message: "Thành công",
+        data: listCart,
+      });
     } else {
       res.status(200).send({
         success: false,
