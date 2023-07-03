@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import feedBackRouter from "./routes/feedBack.routes.js";
 import demandRouter from "./routes/demand.routes.js";
+import myCartRouter from "./routes/myCart.routes.js"
 const app = express();
 dotenv.config();
 const PORT = process.env.PORT || 5000;
@@ -19,6 +20,7 @@ app.use(cors());
 // );
 app.use("/feedback", feedBackRouter);
 app.use("/demands", demandRouter);
+app.use("/myCart", myCartRouter);
 mongoose
   .connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
