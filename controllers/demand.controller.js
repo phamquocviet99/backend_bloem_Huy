@@ -49,7 +49,9 @@ export const get = async (req, res) => {
       .find()
       .then((result) => {
         for (var i in result) {
+          const count = result[i].rating.length
           result[i].rating = averageRating(result[i].rating);
+          result[i].rating.push(count)
         }
         return res.status(200).send({
           success: true,
@@ -74,7 +76,9 @@ export const getById = async (req, res) => {
       await demandModel
         .findById({ _id: req.params.id })
         .then((result) => {
+          const count = result.rating.length
           result.rating = averageRating(result.rating);
+          result.rating.push(count)
           return res.status(200).send({
             success: true,
             code: 0,
