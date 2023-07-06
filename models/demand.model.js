@@ -31,6 +31,9 @@ const schema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    address: {
+      type: String,
+    },
     name: {
       type: String,
       required: true,
