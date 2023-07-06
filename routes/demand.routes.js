@@ -4,7 +4,8 @@ import {
   get,
   getById,
   updateRating,
-  deleteById
+  getByIdVendor,
+  deleteById,
 } from "../controllers/demand.controller.js";
 
 const router = express.Router();
@@ -12,6 +13,7 @@ const router = express.Router();
 router.post("/", post);
 router.get("/", get);
 router.get("/:id", getById);
+router.get("/vendor/:id", getByIdVendor);
 router.delete("/:id", deleteById);
 router.put("/:id/:rating", updateRating);
 

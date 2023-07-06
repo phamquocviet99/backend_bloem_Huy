@@ -49,9 +49,9 @@ export const get = async (req, res) => {
       .find()
       .then((result) => {
         for (var i in result) {
-          const count = result[i].rating.length
+          const count = result[i].rating.length;
           result[i].rating = averageRating(result[i].rating);
-          result[i].rating.push(count)
+          result[i].rating.push(count);
         }
         return res.status(200).send({
           success: true,
@@ -76,9 +76,49 @@ export const getById = async (req, res) => {
       await demandModel
         .findById({ _id: req.params.id })
         .then((result) => {
-          const count = result.rating.length
+          const count = result.rating.length;
           result.rating = averageRating(result.rating);
-          result.rating.push(count)
+          result.rating.push(count);
+          return res.status(200).send({
+            success: true,
+            code: 0,
+            message: "Thành công",
+            data: result,
+          });
+        })
+        .catch((error) => {
+          return res.status(500).send({
+            error: error.message,
+            message: "Không tìm thấy đối tượng Id",
+            success: false,
+          });
+        });
+    } else {
+      res.status(200).send({
+        success: false,
+        code: -1,
+        message: "URL không hợp lệ",
+      });
+      return;
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getByIdVendor = async (req, res) => {
+  try {
+    if (req.params.id) {
+      await demandModel
+        .find({
+          idVendor: req.params.id,
+        })
+        .then((result) => {
+          for (var i in result) {
+            const count = result[i].rating.length;
+            result[i].rating = averageRating(result[i].rating);
+            result[i].rating.push(count);
+          }
           return res.status(200).send({
             success: true,
             code: 0,
