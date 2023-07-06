@@ -30,6 +30,11 @@ const schema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    sale: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
     description: {
       type: String,
       required: true,
