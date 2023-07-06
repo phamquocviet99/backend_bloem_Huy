@@ -10,6 +10,14 @@ export const post = async (req, res) => {
       });
       return;
     }
+    if (req.body.idVendor === req.body.idDemand) {
+      res.status(200).send({
+        success: false,
+        code: -1,
+        message: "Sao tự mua của chính mình :)) !",
+      });
+      return;
+    }
     await demandModel
       .findById({ _id: req.body.idDemand })
       .then((result) => {

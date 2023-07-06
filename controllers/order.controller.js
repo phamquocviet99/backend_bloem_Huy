@@ -17,6 +17,12 @@ export const post = async (req, res) => {
       });
       return;
     }
+    if (req.body.idVendor === req.body.idCustomer)
+      return res.status(200).json({
+        error: err,
+        message: "Người bán và người mua giống nhau",
+        success: false,
+      });
     const listDemands = await getDemandByListId(req.body.demands);
     if (!listDemands)
       return res.status(500).json({
@@ -57,6 +63,7 @@ export const post = async (req, res) => {
           code: 0,
           message: "Tạo đơn hàng thành công !",
           data: {
+            id: result.id,
             number: result.number,
             listDemands: listDemands[0],
             totalPrice: result.totalPrice,
@@ -80,6 +87,250 @@ export const post = async (req, res) => {
   }
 };
 
+export const updateStatus = async (req, res) => {
+  try {
+    if (
+      (req.params.status === "processing" ||
+        req.params.status === "shipping" ||
+        req.params.status === "completed" ||
+        req.params.status === "cancel") &&
+      req.params.id
+    ) {
+      const listDemands = await getDemandByListId(req.body.demands);
+      if (!listDemands)
+        return res.status(500).json({
+          error: err,
+          message: "Không tìm thấy ID Demand",
+          success: false,
+        });
+      await orderModel
+        .findByIdAndUpdate(
+          { _id: req.params.id },
+          { status: req.params.status },
+          { new: true }
+        )
+        .then((result) => {
+          return res.status(200).send({
+            success: true,
+            code: 0,
+            message: "Thành công",
+            data: {
+              id: result.id,
+              number: result.number,
+              listDemands: listDemands[0],
+              totalPrice: result.totalPrice,
+              address: result.address,
+              status: result.status,
+              idVendor: result.idVendor,
+              address: result.address,
+              idCustomer: result.idCustomer,
+            },
+          });
+        })
+        .catch((error) => {
+          return res.status(500).send({
+            error: error,
+            message: "Không tìm thấy đối tượng Id",
+            success: false,
+          });
+        });
+    } else {
+      res.status(200).send({
+        success: false,
+        code: -1,
+        message: "URL không hợp lệ",
+      });
+      return;
+    }
+  } catch (err) {
+    res.status(500).json({ error: true });
+  }
+};
+export const getById = async (req, res) => {
+  try {
+    if (req.params.id) {
+      const listDemands = await getDemandByListId(req.body.demands);
+      if (!listDemands)
+        return res.status(500).json({
+          error: err,
+          message: "Không tìm thấy ID Demand",
+          success: false,
+        });
+      await orderModel
+        .findById({ _id: req.params.id })
+        .then((result) => {
+          return res.status(200).send({
+            success: true,
+            code: 0,
+            message: "Thành công",
+            data: {
+              id: result.id,
+              number: result.number,
+              listDemands: listDemands[0],
+              totalPrice: result.totalPrice,
+              address: result.address,
+              status: result.status,
+              idVendor: result.idVendor,
+              address: result.address,
+              idCustomer: result.idCustomer,
+              shippingCost: result.shippingCost,
+              couponPercent: result.couponPercent,
+            },
+          });
+        })
+        .catch((error) => {
+          return res.status(500).send({
+            error: error.message,
+            message: "Không tìm thấy đối tượng Id",
+            success: false,
+          });
+        });
+    } else {
+      res.status(200).send({
+        success: false,
+        code: -1,
+        message: "URL không hợp lệ",
+      });
+      return;
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getByIdVendor = async (req, res) => {
+  try {
+    if (req.params.id) {
+      var listOrder = await orderModel
+        .find({
+          idVendor: req.params.id,
+        })
+        .catch((error) => {
+          return res.status(500).send({
+            error: error.message,
+            message: "Không tìm thấy đối tượng Id",
+            success: false,
+          });
+        });
+      var listResult = [];
+      if (listOrder) {
+        for (var i in listOrder) {
+          var listDemands = await getDemandByListId(listOrder[i].demands);
+          if (!listDemands) {
+            return res.status(500).json({
+              error: err,
+              message: "Không tìm thấy ID Demand",
+              success: false,
+            });
+          } else {
+            const object = {
+              id: listOrder[i].id,
+              number: listOrder[i].number,
+              listDemands: listDemands[0],
+              totalPrice: listOrder[i].totalPrice,
+              address: listOrder[i].address,
+              status: listOrder[i].status,
+              idVendor: listOrder[i].idVendor,
+              address: listOrder[i].address,
+              idCustomer: listOrder[i].idCustomer,
+              shippingCost: listOrder[i].shippingCost,
+              couponPercent: listOrder[i].couponPercent,
+            };
+            listResult.push(object);
+          }
+        }
+
+        return res.status(200).send({
+          success: true,
+          code: 0,
+          message: "Thành công",
+          data: listResult,
+        });
+      } else {
+        return res.status(500).send({
+          error: error.message,
+          message: "Có lỗi quá trình tìm kiếm !",
+          success: false,
+        });
+      }
+    } else {
+      return res.status(200).send({
+        success: false,
+        code: -1,
+        message: "URL không hợp lệ",
+      });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getByIdCustomer = async (req, res) => {
+  try {
+    if (req.params.id) {
+      var listOrder = await orderModel
+        .find({
+          idCustomer: req.params.id,
+        })
+        .catch((error) => {
+          return res.status(500).send({
+            error: error.message,
+            message: "Không tìm thấy đối tượng Id",
+            success: false,
+          });
+        });
+      var listResult = [];
+      if (listOrder) {
+        for (var i in listOrder) {
+          var listDemands = await getDemandByListId(listOrder[i].demands);
+          if (!listDemands) {
+            return res.status(500).json({
+              error: err,
+              message: "Không tìm thấy ID Demand",
+              success: false,
+            });
+          } else {
+            const object = {
+              id: listOrder[i].id,
+              number: listOrder[i].number,
+              listDemands: listDemands[0],
+              totalPrice: listOrder[i].totalPrice,
+              address: listOrder[i].address,
+              status: listOrder[i].status,
+              idVendor: listOrder[i].idVendor,
+              address: listOrder[i].address,
+              idCustomer: listOrder[i].idCustomer,
+              shippingCost: listOrder[i].shippingCost,
+              couponPercent: listOrder[i].couponPercent,
+            };
+            listResult.push(object);
+          }
+        }
+
+        return res.status(200).send({
+          success: true,
+          code: 0,
+          message: "Thành công",
+          data: listResult,
+        });
+      } else {
+        return res.status(500).send({
+          error: error.message,
+          message: "Có lỗi quá trình tìm kiếm !",
+          success: false,
+        });
+      }
+    } else {
+      return res.status(200).send({
+        success: false,
+        code: -1,
+        message: "URL không hợp lệ",
+      });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 async function getDemandByListId(listDemands) {
   if (listDemands.length < 0) return null;
   var listDetailDemand = [];
