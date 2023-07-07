@@ -46,7 +46,7 @@ export const post = async (req, res) => {
       parseFloat(1 - parseFloat(req.body.couponPercent));
 
     const order = new orderModel({
-      number: parseInt(oldNumber.maxNumber + 1),
+      number: parseInt(oldNumber.maxNumber ? oldNumber.maxNumber : 0 + 1),
       shippingCost: req.body.shippingCost,
       idVendor: req.body.idVendor,
       address: req.body.address,
@@ -103,6 +103,7 @@ export const updateStatus = async (req, res) => {
           message: "Không tìm thấy ID Demand",
           success: false,
         });
+
       await orderModel
         .findByIdAndUpdate(
           { _id: req.params.id },
@@ -134,6 +135,41 @@ export const updateStatus = async (req, res) => {
             success: false,
           });
         });
+      if (req.params.status === "processing") {
+        try {
+          for (var i in listDemands[0]) {
+            const demand = await demandModel
+              .findById({
+                _id: listDemands[0][i]._id,
+              })
+              .catch((error) => {
+                return res.status(500).send({
+                  error: error,
+                  message: "Không tìm thấy đối tượng Id",
+                  success: false,
+                });
+              });
+            await demandModel
+              .findByIdAndUpdate(
+                { _id: demand._id },
+                {
+                  quantity:
+                    parseInt(demand.quantity - listDemands[0][i].quantity) < 0
+                      ? 0
+                      : parseInt(demand.quantity - listDemands[0][i].quantity),
+                },
+                { new: true }
+              )
+              .catch((error) => {
+                return res.status(500).send({
+                  error: error,
+                  message: "Không thành công !",
+                  success: false,
+                });
+              });
+          }
+        } catch (error) {}
+      }
     } else {
       res.status(200).send({
         success: false,
