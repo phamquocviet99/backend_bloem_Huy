@@ -88,7 +88,7 @@ export const getByIdVendor = async (req, res) => {
               .findById({ _id: listCardOfVendor[i]?.idDemand })
               .then((results) => {
                 var n = results;
-                if (!n.quantity === undefined) {
+                if (n.quantity !== undefined) {
                   n["quantity"] =
                     listCardOfVendor[i]?.quantity !== null
                       ? listCardOfVendor[i]?.quantity
