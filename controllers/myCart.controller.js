@@ -53,7 +53,27 @@ export const post = async (req, res) => {
       .json({ error: err, message: "Không thành công", success: false });
   }
 };
-
+export const get = async (req, res) => {
+  try {
+    await myCardModel
+      .find()
+      .then((result) => {
+        return res.status(200).send({
+          success: true,
+          code: 0,
+          message: "Thành công",
+          data: result,
+        });
+      })
+      .catch((error) => {
+        return res
+          .status(500)
+          .send({ error: error, message: "Không thành công", success: false });
+      });
+  } catch (err) {
+    res.status(500).json({ error: true });
+  }
+};
 export const getByIdVendor = async (req, res) => {
   try {
     if (req.params.id) {
@@ -61,23 +81,40 @@ export const getByIdVendor = async (req, res) => {
       const listCardOfVendor = await myCardModel.find({
         idVendor: req.params.id,
       });
-      for (var i in listCardOfVendor) {
-        await demandModel
-          .findById({ _id: listCardOfVendor[i].idDemand })
-          .then((results) => {
-            var n = results;
-            n.quantity = listCardOfVendor[i].quantity;
-            listCart.push(n);
-          })
-          .catch((error) => {
-            return res.status(500).send({
-              success: true,
-              code: 0,
-              message: "Có lỗi trong quá trình lấy dữ liệu",
-              error: error.message,
-            });
-          });
+      try {
+        for (var i in listCardOfVendor) {
+          try {
+            await demandModel
+              .findById({ _id: listCardOfVendor[i]?.idDemand })
+              .then((results) => {
+                var n = results;
+                if (!n.quantity === undefined) {
+                  n["quantity"] =
+                    listCardOfVendor[i]?.quantity !== null
+                      ? listCardOfVendor[i]?.quantity
+                      : 1;
+                }
+                listCart.push(n);
+              })
+              .catch((error) => {
+                return res.status(500).send({
+                  success: true,
+                  code: 0,
+                  message: "Có lỗi trong quá trình lấy dữ liệu",
+                  error: error.message,
+                });
+              });
+          } catch (error) {}
+        }
+      } catch (error) {
+        return res.status(500).send({
+          success: true,
+          code: 0,
+          message: "Có lỗi trong quá trình lấy dữ liệu",
+          error: error.message,
+        });
       }
+
       return res.status(200).send({
         success: true,
         code: 0,
