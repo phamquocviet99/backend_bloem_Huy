@@ -88,12 +88,17 @@ export const getByIdVendor = async (req, res) => {
               .findById({ _id: listCardOfVendor[i]?.idDemand })
               .then((results) => {
                 var n = results;
+
                 if (n.quantity !== undefined) {
                   n["quantity"] =
                     listCardOfVendor[i]?.quantity !== null
                       ? listCardOfVendor[i]?.quantity
                       : 1;
                 }
+
+                n.toObject();
+                n.cId = listCardOfVendor[i].id;
+
                 listCart.push(n);
               })
               .catch((error) => {
@@ -137,7 +142,7 @@ export const deleteById = async (req, res) => {
   try {
     if (req.params.id) {
       await myCardModel
-        .findByIdAndDelete({ _id: req.params.id })
+        .findByIdAndRemove({ _id: req.params.id })
         .then((result) => {
           return res.status(200).send({
             success: true,

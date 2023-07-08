@@ -7,6 +7,7 @@ import feedBackRouter from "./routes/feedBack.routes.js";
 import demandRouter from "./routes/demand.routes.js";
 import myCartRouter from "./routes/myCart.routes.js";
 import orderRouter from "./routes/order.routes.js";
+import walletRouter from "./routes/wallet.routes.js"
 const app = express();
 dotenv.config();
 const PORT = process.env.PORT || 5000;
@@ -23,6 +24,7 @@ app.use("/feedback", feedBackRouter);
 app.use("/demands", demandRouter);
 app.use("/myCart", myCartRouter);
 app.use("/order", orderRouter);
+app.use("/wallet", walletRouter);
 mongoose
   .connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,

@@ -50,6 +50,22 @@ const schema = new mongoose.Schema(
     },
     rating: [],
     images: [],
+    cId: {
+      type: String,
+      default: null,
+    },
+    listComments: [
+      {
+        name: String,
+        comment: String,
+        rating: Number,
+        images: [],
+        createAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );

@@ -1,6 +1,28 @@
 import orderModel from "../models/order.model.js";
 import demandModel from "../models/demand.model.js";
+import { paymentPayout } from "./wallet.controller.js";
 
+export const get = async (req, res) => {
+  try {
+    await orderModel
+      .find()
+      .then((result) => {
+        return res.status(200).send({
+          success: true,
+          code: 0,
+          message: "Thành công",
+          data: result,
+        });
+      })
+      .catch((error) => {
+        return res
+          .status(500)
+          .send({ error: error, message: "Không thành công", success: false });
+      });
+  } catch (err) {
+    res.status(500).json({ error: true });
+  }
+};
 export const post = async (req, res) => {
   try {
     if (
@@ -89,6 +111,7 @@ export const post = async (req, res) => {
 
 export const updateStatus = async (req, res) => {
   try {
+    var order = null;
     if (
       (req.params.status === "processing" ||
         req.params.status === "shipping" ||
@@ -111,6 +134,7 @@ export const updateStatus = async (req, res) => {
           { new: true }
         )
         .then((result) => {
+          order = result;
           return res.status(200).send({
             success: true,
             code: 0,
@@ -135,6 +159,20 @@ export const updateStatus = async (req, res) => {
             success: false,
           });
         });
+      if (req.params.status === "completed") {
+        await paymentPayout(
+          order.idVendor,
+          order.totalPrice,
+          `Nhận tiền đơn hàng số ${order.number}`,
+          "payout"
+        );
+        await paymentPayout(
+          order.idCustomer,
+          order.totalPrice,
+          `Thanh toán đơn hàng số ${order.number}`,
+          "payment"
+        );
+      }
       if (req.params.status === "processing") {
         try {
           for (var i in listDemands[0]) {
