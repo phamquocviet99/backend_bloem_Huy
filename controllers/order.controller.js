@@ -243,36 +243,9 @@ export const updateStatus = async (req, res) => {
 export const getById = async (req, res) => {
   try {
     if (req.params.id) {
-      const listDemands = await getDemandByListId(req.body.demands);
-      if (!listDemands)
-        return res.status(500).json({
-          error: err,
-          message: "Không tìm thấy ID Demand",
-          success: false,
-        });
-      await orderModel
+      const result = await orderModel
         .findById({ _id: req.params.id })
-        .then((result) => {
-          return res.status(200).send({
-            success: true,
-            code: 0,
-            message: "Thành công",
-            data: {
-              isPayment: result.isPayment,
-              id: result.id,
-              number: result.number,
-              listDemands: listDemands[0],
-              totalPrice: result.totalPrice,
-              address: result.address,
-              status: result.status,
-              idVendor: result.idVendor,
-              address: result.address,
-              idCustomer: result.idCustomer,
-              shippingCost: result.shippingCost,
-              couponPercent: result.couponPercent,
-            },
-          });
-        })
+
         .catch((error) => {
           return res.status(500).send({
             error: error.message,
@@ -280,6 +253,32 @@ export const getById = async (req, res) => {
             success: false,
           });
         });
+      const listDemands = await getDemandByListId(result.demands);
+      if (!listDemands)
+        return res.status(500).json({
+          error: err,
+          message: "Không tìm thấy ID Demand",
+          success: false,
+        });
+      return res.status(200).send({
+        success: true,
+        code: 0,
+        message: "Thành công",
+        data: {
+          isPayment: result.isPayment,
+          id: result.id,
+          number: result.number,
+          listDemands: listDemands,
+          totalPrice: result.totalPrice,
+          address: result.address,
+          status: result.status,
+          idVendor: result.idVendor,
+          address: result.address,
+          idCustomer: result.idCustomer,
+          shippingCost: result.shippingCost,
+          couponPercent: result.couponPercent,
+        },
+      });
     } else {
       res.status(200).send({
         success: false,
@@ -429,7 +428,7 @@ export const getByIdCustomer = async (req, res) => {
   }
 };
 async function getDemandByListId(listDemands) {
-  if (listDemands.length < 0) return null;
+  if (listDemands?.length < 0) return null;
   var listDetailDemand = [];
   var totalPriceDemand = 0;
   for (var i in listDemands) {
