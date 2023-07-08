@@ -29,8 +29,7 @@ export const post = async (req, res) => {
       !req.body.shippingCost ||
       !req.body.idVendor ||
       !req.body.address ||
-      !req.body.idCustomer ||
-      !req.body.couponPercent
+      !req.body.idCustomer 
     ) {
       res.status(200).send({
         success: false,
