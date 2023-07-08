@@ -93,6 +93,7 @@ export const post = async (req, res) => {
             idVendor: result.idVendor,
             address: result.address,
             idCustomer: result.idCustomer,
+            isPayment: result.isPayment,
           },
         });
       })
@@ -130,7 +131,10 @@ export const updateStatus = async (req, res) => {
       await orderModel
         .findByIdAndUpdate(
           { _id: req.params.id },
-          { status: req.params.status },
+          {
+            status: req.params.status,
+            isPayment: req.params.status === "payment" ? true : false,
+          },
           { new: true }
         )
         .then((result) => {
@@ -149,6 +153,7 @@ export const updateStatus = async (req, res) => {
               idVendor: result.idVendor,
               address: result.address,
               idCustomer: result.idCustomer,
+              isPayment: result.isPayment,
             },
           });
         })
@@ -253,6 +258,7 @@ export const getById = async (req, res) => {
             code: 0,
             message: "Thành công",
             data: {
+              isPayment: result.isPayment,
               id: result.id,
               number: result.number,
               listDemands: listDemands[0],
@@ -324,6 +330,7 @@ export const getByIdVendor = async (req, res) => {
               idCustomer: listOrder[i].idCustomer,
               shippingCost: listOrder[i].shippingCost,
               couponPercent: listOrder[i].couponPercent,
+              isPayment: listOrder[i].isPayment,
             };
             listResult.push(object);
           }
@@ -391,6 +398,7 @@ export const getByIdCustomer = async (req, res) => {
               idCustomer: listOrder[i].idCustomer,
               shippingCost: listOrder[i].shippingCost,
               couponPercent: listOrder[i].couponPercent,
+              isPayment: listOrder[i].isPayment,
             };
             listResult.push(object);
           }

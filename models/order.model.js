@@ -23,6 +23,11 @@ const schema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    isPayment: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
     couponPercent: {
       type: Number,
       required: true,
