@@ -172,6 +172,13 @@ export const updateStatus = async (req, res) => {
           `Thanh toán đơn hàng số ${order.number}`,
           "payment"
         );
+
+        await paymentPayout(
+          "vi-san-546",
+          order.totalPrice * 0.1,
+          `Phí dịch vụ đơn hàng số ${order.number}`,
+          "payout"
+        );
       }
       if (req.params.status === "processing") {
         try {
