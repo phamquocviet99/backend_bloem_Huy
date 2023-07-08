@@ -10,7 +10,7 @@ const schema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    shippingCost: { type: Number, required: true },
+    shippingCost: { type: Number, required: true, default: 0 },
     idVendor: {
       type: String,
       required: true,
@@ -26,6 +26,7 @@ const schema = new mongoose.Schema(
     couponPercent: {
       type: Number,
       required: true,
+      default: 0,
     },
     status: {
       type: String,
