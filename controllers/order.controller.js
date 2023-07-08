@@ -29,7 +29,7 @@ export const post = async (req, res) => {
       !req.body.shippingCost ||
       !req.body.idVendor ||
       !req.body.address ||
-      !req.body.idCustomer 
+      !req.body.idCustomer
     ) {
       res.status(200).send({
         success: false,
@@ -114,6 +114,7 @@ export const updateStatus = async (req, res) => {
     if (
       (req.params.status === "processing" ||
         req.params.status === "shipping" ||
+        req.params.status === "payment" ||
         req.params.status === "completed" ||
         req.params.status === "cancel") &&
       req.params.id
@@ -165,17 +166,25 @@ export const updateStatus = async (req, res) => {
           `Nhận tiền đơn hàng số ${order.number}`,
           "payout"
         );
+
+        await paymentPayout(
+          "vi-san-546",
+          order.totalPrice * 0.9,
+          `Phí dịch vụ đơn hàng số ${order.number}`,
+          "payment"
+        );
+      }
+      if (req.params.status === "payment") {
         await paymentPayout(
           order.idCustomer,
           order.totalPrice,
           `Thanh toán đơn hàng số ${order.number}`,
           "payment"
         );
-
         await paymentPayout(
           "vi-san-546",
-          order.totalPrice * 0.1,
-          `Phí dịch vụ đơn hàng số ${order.number}`,
+          order.totalPrice,
+          `Tiền hàng của đơn hàng số ${order.number}`,
           "payout"
         );
       }
