@@ -44,7 +44,7 @@ export const post = async (req, res) => {
         message: "Người bán và người mua giống nhau",
         success: false,
       });
-    const listDemands = await getDemandByListId(req.body.demands);
+    const listDemands = await getDemandByListId(req.body?.demands);
     if (!listDemands)
       return res.status(500).json({
         error: err,
